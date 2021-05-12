@@ -57,3 +57,128 @@ class DifferentialDriveRobot:
             right_speed = -self.right_speed
 
         return left_speed, right_speed
+
+
+class WindTurbine:
+    def __init__(self, spin_speed_limit=6):
+        self.state = "INIT"
+        self.spin_speed_limit = spin_speed_limit
+        self.spin_speed = 0
+        self.speed_increment = 1
+        self.faults = ['unexpected_speed_increase', 'unexpected_slow_down']
+        self.active_fault = False
+
+    def reset(self):
+        self.state = "INIT"
+        self.spin_speed = 0
+        self.speed_increment = 2
+        self.active_fault = False
+
+    def update_spin_speed(self):
+        self.spin_speed = min(self.spin_speed + self.speed_increment, self.spin_speed_limit)
+
+    def stop_turbine(self):
+        self.spin_speed = 0
+
+    def get_turbine_speed(self):
+        return self.spin_speed
+
+    def inject_fault(self, fault):
+        assert fault in self.faults
+        if self.active_fault:
+            return "-"
+        self.active_fault = True
+        if fault == 'unexpected_speed_increase':
+            self.speed_increment = min(self.speed_increment + 1, self.spin_speed_limit)
+            if self.spin_speed > 0:
+                self.update_spin_speed()
+        if fault == 'unexpected_slow_down':
+            self.speed_increment = max(self.speed_increment - 1, 0)
+            if self.spin_speed > 0:
+                self.update_spin_speed()
+
+        return self.get_turbine_speed()
+
+
+class LightSwitch:
+    def __init__(self, goal=5):
+        self.timer = 0
+        self.delay = 0
+        self.time_goal = goal
+
+    def reset(self):
+        self.timer = 0
+        self.delay = 0
+
+    def press_switch(self):
+        if self.timer == self.time_goal:
+            return
+        self.timer += 1 - self.delay
+        self.timer = max(min(self.timer, self.time_goal), 0)
+
+    def increase_delay(self):
+        self.delay = max(self.delay + 1, 3)
+
+    def fix_delay(self):
+        self.delay = 0
+
+    def get_status(self):
+        return "SHINING" if self.timer == self.time_goal else self.timer
+
+
+class GearBox:
+    def __init__(self, num_gears=5):
+        self.gear = 1
+        self.num_gears = num_gears
+        self.faults = []
+        self.reverse_fault_counter = 0
+
+        self.clutch_pressed = False
+        self.gear_changed = False
+
+    def reset(self):
+        self.gear = 1
+        self.faults = []
+        self.reverse_fault_counter = 0
+        self.clutch_pressed = False
+        self.gear_changed = False
+
+    def press_clutch(self):
+        if not self.clutch_pressed:
+            self.clutch_pressed = True
+            return 'CLUTCH_PRESSED'
+        return 'NO_EFFECT'
+
+    def release_clutch(self):
+        if self.clutch_pressed:
+            self.clutch_pressed = False
+            self.gear_changed = False
+            return 'CLUTCH_RELEASED'
+        return 'NO_EFFECT'
+
+    def put_in_reverse(self):
+        if self.clutch_pressed and not self.gear_changed:
+            if self.gear == 1:
+                self.gear = -1
+                return self.gear
+            else:
+                self.reverse_fault_counter += 1
+                if self.reverse_fault_counter >= 2:
+                    return "BROKEN"
+                return self.gear
+        return 'NO_EFFECT'
+
+    def increase_gear(self):
+        if self.clutch_pressed and not self.gear_changed:
+            self.gear = min(self.gear + 1, self.num_gears)
+            self.gear_changed = True
+            return self.gear
+        return 'NO_EFFECT'
+
+    def decrease_gear(self):
+        if self.clutch_pressed and not self.gear_changed:
+            self.gear = max(self.gear - 1, 1)
+            self.gear_changed = True
+            return self.gear
+        return 'NO_EFFECT'
+
