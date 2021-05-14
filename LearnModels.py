@@ -119,5 +119,5 @@ def learn_stochastic_light_switch(visualize=False):
 
 
 if __name__ == '__main__':
-    model = learn_stochastic_light_switch(visualize=True)
+    model = learn_crossroad(True)
     print(model)

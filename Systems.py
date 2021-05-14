@@ -228,54 +228,83 @@ class VendingMachine:
 class Crossroad:
     def __init__(self):
         self.directions = {'NS', 'EW'}
-
-        self.NS_traffic_light = False
+        self.curr_dir = 'NS'
+        self.time_to_change = 0
+        self.scheduled_change = None
         self.NS_traffic_sensor = False
         self.NS_pedestrian = False
-        self.EW_traffic_light = False
         self.EW_traffic_sensor = False
         self.EW_pedestrian = False
+        self.faulty_button = False
+        self.faulty_sensor = False
 
     def pedestrian_button(self, direction):
         assert direction in self.directions
-        if direction == 'NS':
+        if direction == 'NS' and not self.faulty_button:
             self.NS_pedestrian = True
-            # return 'NS_PEDESTRIAN_WAITING'
-        else:
+        elif direction == 'EW' and not self.faulty_button:
             self.EW_pedestrian = True
-            # return 'EW_PEDESTRIAN_WAITING'
         return self.change_traffic_lights()
 
     def car_arriving(self, direction):
         assert direction in self.directions
-        if direction == 'NS':
+        if direction == 'NS' and not self.faulty_sensor:
             self.NS_traffic_sensor = True
-        else:
+        elif direction == 'EW' and not self.faulty_sensor:
             self.EW_traffic_sensor = True
         return self.change_traffic_lights()
+
+    def waiting(self):
+        return self.update()
 
     def change_traffic_lights(self):
         # IN case that both NS and EW are active, NS has advantage
         if self.NS_pedestrian:
-            self.NS_traffic_light = True
-            self.EW_traffic_light = False
             self.NS_pedestrian = False
-            return 'NS_OPEN'
+            if self.curr_dir == 'NS':
+                pass
+            elif not self.scheduled_change:
+                self.scheduled_change = 'NS'
+                self.time_to_change = 4
         elif self.EW_pedestrian:
-            self.NS_traffic_light = False
-            self.EW_traffic_light = True
             self.EW_pedestrian = False
-            return 'EW_OPEN'
+            if self.curr_dir == 'EW':
+                pass
+            elif not self.scheduled_change:
+                self.scheduled_change = 'EW'
+                self.time_to_change = 4
         elif self.NS_traffic_sensor:
-            self.NS_traffic_light = True
-            self.EW_traffic_light = False
-            self.NS_traffic_sensor = False
-            return 'NS_OPEN'
+            self.NS_pedestrian = False
+            if self.curr_dir == 'NS':
+                pass
+            elif not self.scheduled_change:
+                self.scheduled_change = 'NS'
+                self.time_to_change = 3
         elif self.EW_traffic_sensor:
-            self.NS_traffic_light = False
-            self.EW_traffic_light = True
-            self.EW_traffic_sensor = False
-            return 'EW_OPEN'
+            self.EW_pedestrian = False
+            if self.curr_dir == 'EW':
+                pass
+            elif not self.scheduled_change:
+                self.scheduled_change = 'EW'
+                self.time_to_change = 3
+        self.update()
+        return self.curr_dir
+
+    def update(self):
+        if self.scheduled_change:
+            self.time_to_change -= 1
+            if self.time_to_change == 0:
+                self.curr_dir = self.scheduled_change
+                self.scheduled_change = None
+                self.time_to_change = 0
+
+    def inject_fault_in_sensor(self):
+        self.faulty_sensor = True
+        return self.curr_dir
+
+    def inject_fault_in_button(self):
+        self.faulty_button = True
+        return self.curr_dir
 
 
 class StochasticLightSwitch:
