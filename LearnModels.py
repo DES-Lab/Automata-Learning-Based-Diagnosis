@@ -1,9 +1,10 @@
 from aalpy.SULs import MealySUL
-from aalpy.learning_algs import run_Lstar
-from aalpy.oracles import RandomWMethodEqOracle
+from aalpy.learning_algs import run_Lstar, run_stochastic_Lstar
+from aalpy.oracles import RandomWMethodEqOracle, UnseenOutputRandomWordEqOracle
 from aalpy.utils import visualize_automaton, save_automaton_to_file
 
-from SULs import StrongFaultRobot, TurbineSUL, LightSwitchSUL, GearBoxSUL, VendingMachineSUL, CrossroadSUL
+from SULs import StrongFaultRobot, TurbineSUL, LightSwitchSUL, GearBoxSUL, VendingMachineSUL, CrossroadSUL, \
+    StochasticLightSUL
 
 
 def learn_diff_drive_robot(visualize=False):
@@ -103,5 +104,20 @@ def learn_crossroad(visualize=False):
     return learned_model
 
 
+def learn_stochastic_light_switch(visualize=False):
+    sul = StochasticLightSUL()
+    alphabet = ['press', 'release']
+
+    eq_oracle = UnseenOutputRandomWordEqOracle(alphabet, sul, num_walks=100, min_walk_len=3, max_walk_len=7)
+
+    learned_model = run_stochastic_Lstar(alphabet, sul, eq_oracle, automaton_type='smm')
+
+    if visualize:
+        visualize_automaton(learned_model, display_same_state_trans=True)
+
+    return learned_model
+
+
 if __name__ == '__main__':
-    model = learn_diff_drive_robot()
+    model = learn_stochastic_light_switch(visualize=True)
+    print(model)

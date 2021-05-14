@@ -1,5 +1,6 @@
 from aalpy.base import SUL
-from Systems import DifferentialDriveRobot, WindTurbine, LightSwitch, GearBox, VendingMachine, Crossroad
+from Systems import DifferentialDriveRobot, WindTurbine, LightSwitch, GearBox, VendingMachine, \
+    Crossroad, StochasticLightSwitch
 
 
 class StrongFaultRobot(SUL):
@@ -17,7 +18,7 @@ class StrongFaultRobot(SUL):
     def step(self, letter):
         if not isinstance(letter, (tuple, list)):
             return self.robot.inject_fault(letter)
-            #return self.robot.get_heading_direction()
+            # return self.robot.get_heading_direction()
         self.robot.change_speed(letter[0], letter[1])
         return self.robot.get_heading_direction()
 
@@ -126,3 +127,18 @@ class CrossroadSUL(SUL):
             return self.crossroad.pedestrian_button(letter.split('_')[-1])
         else:
             return self.crossroad.car_arriving(letter.split('_')[-1])
+
+
+class StochasticLightSUL(SUL):
+    def __init__(self):
+        super().__init__()
+        self.light_switch = StochasticLightSwitch()
+
+    def pre(self):
+        self.light_switch.reset()
+
+    def post(self):
+        pass
+
+    def step(self, letter):
+        return self.light_switch.press() if letter == 'press' else self.light_switch.release()

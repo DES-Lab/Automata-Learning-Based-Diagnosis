@@ -1,3 +1,4 @@
+import random
 from collections import defaultdict
 
 
@@ -239,10 +240,10 @@ class Crossroad:
         assert direction in self.directions
         if direction == 'NS':
             self.NS_pedestrian = True
-            #return 'NS_PEDESTRIAN_WAITING'
+            # return 'NS_PEDESTRIAN_WAITING'
         else:
             self.EW_pedestrian = True
-            #return 'EW_PEDESTRIAN_WAITING'
+            # return 'EW_PEDESTRIAN_WAITING'
         return self.change_traffic_lights()
 
     def car_arriving(self, direction):
@@ -275,3 +276,35 @@ class Crossroad:
             self.EW_traffic_light = True
             self.EW_traffic_sensor = False
             return 'EW_OPEN'
+
+
+class StochasticLightSwitch:
+    def __init__(self):
+        self.counter = 0
+        self.fault_activated = False
+
+    def reset(self):
+        self.counter = 0
+        self.fault_activated = False
+
+    def release(self):
+        if self.fault_activated:
+            return 'SHINING'
+        else:
+            self.counter = 0
+            return 'OFF'
+
+    def press(self):
+        self.counter = min(self.counter + 1, 5)
+        if self.counter == 2:
+            if random.random() <= 0.2:
+                self.fault_activated = True
+                return 'SHINING'
+        if self.fault_activated:
+            return 'SHINING'
+
+        if self.counter == 5:
+            if random.random() >= 0.1:
+                return 'OFF'
+            return 'SHINING'
+        return 'OFF'
