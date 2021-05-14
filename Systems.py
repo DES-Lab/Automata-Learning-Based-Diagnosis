@@ -117,7 +117,7 @@ class LightSwitch:
         self.timer = max(min(self.timer, self.time_goal), 0)
 
     def increase_delay(self):
-        self.delay = max(self.delay + 1, 3)
+        self.delay = 1
 
     def fix_delay(self):
         self.delay = 0
@@ -160,6 +160,7 @@ class GearBox:
         if self.clutch_pressed and not self.gear_changed:
             if self.gear == 1:
                 self.gear = -1
+                self.gear_changed = True
                 return self.gear
             else:
                 self.reverse_fault_counter += 1
@@ -170,7 +171,7 @@ class GearBox:
 
     def increase_gear(self):
         if self.clutch_pressed and not self.gear_changed:
-            self.gear = min(self.gear + 1, self.num_gears)
+            self.gear = min(max(self.gear + 1, 1), self.num_gears)
             self.gear_changed = True
             return self.gear
         return 'NO_EFFECT'
@@ -182,3 +183,33 @@ class GearBox:
             return self.gear
         return 'NO_EFFECT'
 
+
+class VendingMachine:
+    def __init__(self):
+        self.money_counter = 0
+        self.coins = {0.2, 0.5, 1}
+        self.products = {'coke', 'water', 'peanuts'}
+
+    def reset(self):
+        self.money_counter = 0
+
+    def add_coin(self, coin):
+        assert coin in self.coins
+        self.money_counter += coin
+        if self.money_counter > 2:
+            self.money_counter = 2
+            return 'MAX_COINS_REACHED'
+        return f'COIN_ADDED_{coin}'
+
+    def get_product(self, product):
+        assert product in self.products
+        if product == 'coke' and self.money_counter >= 1.5:
+            self.money_counter -= 1.5
+            return 'DROP_COKE'
+        elif product == 'water' and self.money_counter >= 0.5:
+            self.money_counter -= 0.5
+            return 'DROP_WATER'
+        elif product == 'peanuts' and self.money_counter >= 1:
+            self.money_counter -= 1
+            return 'DROP PEANUTS'
+        return 'INSUFFICIENT_COINS'

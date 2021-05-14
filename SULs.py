@@ -1,5 +1,5 @@
 from aalpy.base import SUL
-from Systems import DifferentialDriveRobot, WindTurbine, LightSwitch, GearBox
+from Systems import DifferentialDriveRobot, WindTurbine, LightSwitch, GearBox, VendingMachine
 
 
 class StrongFaultRobot(SUL):
@@ -88,3 +88,22 @@ class GearBoxSUL(SUL):
             return self.gearbox.increase_gear()
         else:
             return self.gearbox.decrease_gear()
+
+
+class VendingMachineSUL(SUL):
+    def __init__(self):
+        super().__init__()
+        self.vending_machine = VendingMachine()
+        self.alphabet = ['add_coin_0.2', 'add_coin_0.5', 'add_coin_1', 'get_coke', 'get_water', 'get_peanuts']
+
+    def pre(self):
+        self.vending_machine.reset()
+
+    def post(self):
+        pass
+
+    def step(self, letter):
+        if 'add_coin' in letter:
+            return self.vending_machine.add_coin(float(letter.split('_')[-1]))
+        else:
+            return self.vending_machine.get_product(letter.split('_')[-1])

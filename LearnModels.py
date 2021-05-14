@@ -2,7 +2,7 @@ from aalpy.learning_algs import run_Lstar
 from aalpy.oracles import RandomWMethodEqOracle
 from aalpy.utils import visualize_automaton
 
-from SULs import StrongFaultRobot, TurbineSUL, LightSwitchSUL, GearBoxSUL
+from SULs import StrongFaultRobot, TurbineSUL, LightSwitchSUL, GearBoxSUL, VendingMachineSUL
 
 
 def learn_diff_drive_robot():
@@ -35,15 +35,16 @@ def learn_wind_turbine():
 
 
 def learn_light_switch():
-    alphabet = ['press', 'increase_delay',] # 'fix_delay'
+    alphabet = ['press', 'increase_delay', 'fix_delay']  # 'fix_delay'
 
     sul = LightSwitchSUL()
 
     eq_oracle = RandomWMethodEqOracle(alphabet, sul, walks_per_state=20, walk_len=15)
 
-    learned_model = run_Lstar(alphabet, sul, eq_oracle, automaton_type='mealy')
+    learned_model = run_Lstar(alphabet, sul, eq_oracle, automaton_type='moore')
 
     visualize_automaton(learned_model, display_same_state_trans=False)
+
 
 def learn_gearbox():
     alphabet = ['press_clutch', 'release_clutch', 'put_in_reverse', 'increase_gear', 'decrease_gear']
@@ -56,6 +57,18 @@ def learn_gearbox():
 
     visualize_automaton(learned_model, display_same_state_trans=False)
 
+
+def learn_vending_machine():
+    sul = VendingMachineSUL()
+    alphabet = sul.alphabet
+
+    eq_oracle = RandomWMethodEqOracle(alphabet, sul, walks_per_state=50, walk_len=20)
+
+    learned_model = run_Lstar(alphabet, sul, eq_oracle, automaton_type='mealy')
+
+    visualize_automaton(learned_model, display_same_state_trans=False)
+
+
 if __name__ == '__main__':
-    learn_gearbox()
-    #learn_wind_turbine()
+    learn_vending_machine()
+    # learn_wind_turbine()
