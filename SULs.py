@@ -16,8 +16,8 @@ class StrongFaultRobot(SUL):
 
     def step(self, letter):
         if not isinstance(letter, (tuple, list)):
-            self.robot.inject_fault(letter)
-            return self.robot.get_heading_direction()
+            return self.robot.inject_fault(letter)
+            #return self.robot.get_heading_direction()
         self.robot.change_speed(letter[0], letter[1])
         return self.robot.get_heading_direction()
 

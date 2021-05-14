@@ -1,11 +1,12 @@
+from aalpy.SULs import MealySUL
 from aalpy.learning_algs import run_Lstar
 from aalpy.oracles import RandomWMethodEqOracle
-from aalpy.utils import visualize_automaton
+from aalpy.utils import visualize_automaton, save_automaton_to_file
 
 from SULs import StrongFaultRobot, TurbineSUL, LightSwitchSUL, GearBoxSUL, VendingMachineSUL, CrossroadSUL
 
 
-def learn_diff_drive_robot():
+def learn_diff_drive_robot(visualize=False):
     all_faults = ['left_faster', 'left_slower', 'left_stuck', 'right_faster', 'right_slower', 'right_stuck']
 
     wheel_inputs = [(0, 0), (0, 2), (2, 0), (2, 2), (0, -2), (2, -2), (-2, 0), (-2, 2), (-2, -2)]
@@ -19,10 +20,13 @@ def learn_diff_drive_robot():
 
     learned_model = run_Lstar(alphabet, sul, eq_oracle, automaton_type='mealy')
 
-    visualize_automaton(learned_model, display_same_state_trans=False)
+    if visualize:
+        visualize_automaton(learned_model, display_same_state_trans=False)
+
+    return learned_model
 
 
-def learn_wind_turbine():
+def learn_wind_turbine(visualize=False):
     alphabet = ['increase_speed', 'stop_turbine', 'unexpected_speed_increase', 'unexpected_slow_down']
 
     sul = TurbineSUL()
@@ -31,10 +35,13 @@ def learn_wind_turbine():
 
     learned_model = run_Lstar(alphabet, sul, eq_oracle, automaton_type='mealy')
 
-    visualize_automaton(learned_model, display_same_state_trans=False)
+    if visualize:
+        visualize_automaton(learned_model, display_same_state_trans=False)
+
+    return learned_model
 
 
-def learn_light_switch():
+def learn_light_switch(visualize=False):
     alphabet = ['press', 'increase_delay', 'fix_delay']  # 'fix_delay'
 
     sul = LightSwitchSUL()
@@ -43,10 +50,13 @@ def learn_light_switch():
 
     learned_model = run_Lstar(alphabet, sul, eq_oracle, automaton_type='moore')
 
-    visualize_automaton(learned_model, display_same_state_trans=False)
+    if visualize:
+        visualize_automaton(learned_model, display_same_state_trans=False)
+
+    return learned_model
 
 
-def learn_gearbox():
+def learn_gearbox(visualize=False):
     alphabet = ['press_clutch', 'release_clutch', 'put_in_reverse', 'increase_gear', 'decrease_gear']
 
     sul = GearBoxSUL()
@@ -55,10 +65,13 @@ def learn_gearbox():
 
     learned_model = run_Lstar(alphabet, sul, eq_oracle, automaton_type='moore')
 
-    visualize_automaton(learned_model, display_same_state_trans=False)
+    if visualize:
+        visualize_automaton(learned_model, display_same_state_trans=False)
+
+    return learned_model
 
 
-def learn_vending_machine():
+def learn_vending_machine(visualize=False):
     sul = VendingMachineSUL()
     alphabet = sul.alphabet
 
@@ -66,10 +79,17 @@ def learn_vending_machine():
 
     learned_model = run_Lstar(alphabet, sul, eq_oracle, automaton_type='mealy')
 
-    visualize_automaton(learned_model, display_same_state_trans=False)
+    # Example of a error
+    sul = MealySUL(learned_model)
+    print(sul.query(('add_coin_0.2', 'add_coin_0.5', 'add_coin_0.2', 'add_coin_0.2', 'add_coin_0.2', 'add_coin_0.2',)))
+
+    if visualize:
+        visualize_automaton(learned_model, display_same_state_trans=False)
+
+    return learned_model
 
 
-def learn_crossroad():
+def learn_crossroad(visualize=False):
     sul = CrossroadSUL()
     alphabet = sul.alphabet
 
@@ -77,9 +97,11 @@ def learn_crossroad():
 
     learned_model = run_Lstar(alphabet, sul, eq_oracle, automaton_type='mealy')
 
-    visualize_automaton(learned_model, display_same_state_trans=True)
+    if visualize:
+        visualize_automaton(learned_model, display_same_state_trans=False)
+
+    return learned_model
 
 
 if __name__ == '__main__':
-    learn_diff_drive_robot()
-    # learn_wind_turbine()
+    model = learn_diff_drive_robot()

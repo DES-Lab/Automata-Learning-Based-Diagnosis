@@ -1,3 +1,6 @@
+from collections import defaultdict
+
+
 class DifferentialDriveRobot:
     def __init__(self, lower_speed_limit=0, upper_speed_limit=10, stochastic_fault_prob=None):
         self.lower_speed_limit = lower_speed_limit
@@ -187,15 +190,21 @@ class GearBox:
 class VendingMachine:
     def __init__(self):
         self.money_counter = 0
+        self.coin_counter = defaultdict(int)
         self.coins = {0.2, 0.5, 1}
         self.products = {'coke', 'water', 'peanuts'}
 
     def reset(self):
         self.money_counter = 0
+        self.coin_counter.clear()
 
     def add_coin(self, coin):
         assert coin in self.coins
         self.money_counter += coin
+        self.coin_counter[coin] += 1
+        if self.coin_counter[0.2] == 5:
+            self.money_counter = 2
+            return 'MAX_COINS_REACHED'
         if self.money_counter > 2:
             self.money_counter = 2
             return 'MAX_COINS_REACHED'
