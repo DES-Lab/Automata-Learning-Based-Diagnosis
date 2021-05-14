@@ -213,3 +213,56 @@ class VendingMachine:
             self.money_counter -= 1
             return 'DROP PEANUTS'
         return 'INSUFFICIENT_COINS'
+
+
+class Crossroad:
+    def __init__(self):
+        self.directions = {'NS', 'EW'}
+
+        self.NS_traffic_light = False
+        self.NS_traffic_sensor = False
+        self.NS_pedestrian = False
+        self.EW_traffic_light = False
+        self.EW_traffic_sensor = False
+        self.EW_pedestrian = False
+
+    def pedestrian_button(self, direction):
+        assert direction in self.directions
+        if direction == 'NS':
+            self.NS_pedestrian = True
+            #return 'NS_PEDESTRIAN_WAITING'
+        else:
+            self.EW_pedestrian = True
+            #return 'EW_PEDESTRIAN_WAITING'
+        return self.change_traffic_lights()
+
+    def car_arriving(self, direction):
+        assert direction in self.directions
+        if direction == 'NS':
+            self.NS_traffic_sensor = True
+        else:
+            self.EW_traffic_sensor = True
+        return self.change_traffic_lights()
+
+    def change_traffic_lights(self):
+        # IN case that both NS and EW are active, NS has advantage
+        if self.NS_pedestrian:
+            self.NS_traffic_light = True
+            self.EW_traffic_light = False
+            self.NS_pedestrian = False
+            return 'NS_OPEN'
+        elif self.EW_pedestrian:
+            self.NS_traffic_light = False
+            self.EW_traffic_light = True
+            self.EW_pedestrian = False
+            return 'EW_OPEN'
+        elif self.NS_traffic_sensor:
+            self.NS_traffic_light = True
+            self.EW_traffic_light = False
+            self.NS_traffic_sensor = False
+            return 'NS_OPEN'
+        elif self.EW_traffic_sensor:
+            self.NS_traffic_light = False
+            self.EW_traffic_light = True
+            self.EW_traffic_sensor = False
+            return 'EW_OPEN'

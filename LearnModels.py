@@ -2,7 +2,7 @@ from aalpy.learning_algs import run_Lstar
 from aalpy.oracles import RandomWMethodEqOracle
 from aalpy.utils import visualize_automaton
 
-from SULs import StrongFaultRobot, TurbineSUL, LightSwitchSUL, GearBoxSUL, VendingMachineSUL
+from SULs import StrongFaultRobot, TurbineSUL, LightSwitchSUL, GearBoxSUL, VendingMachineSUL, CrossroadSUL
 
 
 def learn_diff_drive_robot():
@@ -53,7 +53,7 @@ def learn_gearbox():
 
     eq_oracle = RandomWMethodEqOracle(alphabet, sul, walks_per_state=20, walk_len=15)
 
-    learned_model = run_Lstar(alphabet, sul, eq_oracle, automaton_type='mealy')
+    learned_model = run_Lstar(alphabet, sul, eq_oracle, automaton_type='moore')
 
     visualize_automaton(learned_model, display_same_state_trans=False)
 
@@ -69,6 +69,17 @@ def learn_vending_machine():
     visualize_automaton(learned_model, display_same_state_trans=False)
 
 
+def learn_crossroad():
+    sul = CrossroadSUL()
+    alphabet = sul.alphabet
+
+    eq_oracle = RandomWMethodEqOracle(alphabet, sul, walks_per_state=50, walk_len=20)
+
+    learned_model = run_Lstar(alphabet, sul, eq_oracle, automaton_type='mealy')
+
+    visualize_automaton(learned_model, display_same_state_trans=True)
+
+
 if __name__ == '__main__':
-    learn_vending_machine()
+    learn_diff_drive_robot()
     # learn_wind_turbine()

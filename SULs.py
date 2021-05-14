@@ -1,5 +1,5 @@
 from aalpy.base import SUL
-from Systems import DifferentialDriveRobot, WindTurbine, LightSwitch, GearBox, VendingMachine
+from Systems import DifferentialDriveRobot, WindTurbine, LightSwitch, GearBox, VendingMachine, Crossroad
 
 
 class StrongFaultRobot(SUL):
@@ -107,3 +107,22 @@ class VendingMachineSUL(SUL):
             return self.vending_machine.add_coin(float(letter.split('_')[-1]))
         else:
             return self.vending_machine.get_product(letter.split('_')[-1])
+
+
+class CrossroadSUL(SUL):
+    def __init__(self):
+        super().__init__()
+        self.crossroad = Crossroad()
+        self.alphabet = ['pedestrian_NS', 'pedestrian_EW', 'traffic_NS', 'traffic_EW']
+
+    def pre(self):
+        self.crossroad = Crossroad()
+
+    def post(self):
+        pass
+
+    def step(self, letter):
+        if 'pedestrian' in letter:
+            return self.crossroad.pedestrian_button(letter.split('_')[-1])
+        else:
+            return self.crossroad.car_arriving(letter.split('_')[-1])
