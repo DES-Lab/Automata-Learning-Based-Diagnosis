@@ -114,8 +114,12 @@ class CrossroadSUL(SUL):
     def __init__(self):
         super().__init__()
         self.crossroad = Crossroad()
-        self.alphabet = ['pedestrian_NS', 'pedestrian_EW', 'traffic_NS', 'traffic_EW', 'waiting', 'fault_button',
-                         'fault_traffic_sensor']
+        self.full_alphabet = ['pedestrian_NS', 'pedestrian_EW',
+                         'traffic_NS', 'traffic_EW', 'waiting', 'fault_button',
+                         'fault_sensor_ns','fault_sensor_ew']
+        self.alphabet = ['traffic_NS', 'traffic_EW', 'waiting',
+                         'fault_sensor_ns','fault_sensor_ew']
+        self.non_faulty_alphabet = ['traffic_NS', 'traffic_EW', 'waiting']
 
     def pre(self):
         self.crossroad = Crossroad()
@@ -126,8 +130,10 @@ class CrossroadSUL(SUL):
     def step(self, letter):
         if 'fault_button' == letter:
             return self.crossroad.inject_fault_in_button()
-        elif 'fault_traffic_sensor' == letter:
-            return self.crossroad.inject_fault_in_sensor()
+        elif 'fault_sensor_ns' == letter:
+            return self.crossroad.inject_fault_in_sensor_ns()
+        elif 'fault_sensor_ew' == letter:
+            return self.crossroad.inject_fault_in_sensor_ew()
         elif 'waiting' == letter:
             return self.crossroad.waiting()
         elif 'pedestrian' in letter:

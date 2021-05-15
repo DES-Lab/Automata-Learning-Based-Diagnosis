@@ -225,10 +225,15 @@ class VendingMachine:
         return 'INSUFFICIENT_COINS'
 
 
+
 class Crossroad:
     def __init__(self):
         self.directions = {'NS', 'EW'}
         self.curr_dir = 'NS'
+        self.cars_ns = 0  # cars seen by traffic light
+        self.cars_ew = 0  # cars seen by traffic light
+        self.real_cars_ns = 0
+        self.real_cars_ew = 0
         self.time_to_change = 0
         self.scheduled_change = None
         self.NS_traffic_sensor = False
@@ -236,7 +241,8 @@ class Crossroad:
         self.EW_traffic_sensor = False
         self.EW_pedestrian = False
         self.faulty_button = False
-        self.faulty_sensor = False
+        self.faulty_sensor_NS = False
+        self.faulty_sensor_EW = False
 
     def pedestrian_button(self, direction):
         assert direction in self.directions
@@ -248,14 +254,21 @@ class Crossroad:
 
     def car_arriving(self, direction):
         assert direction in self.directions
-        if direction == 'NS' and not self.faulty_sensor:
-            self.NS_traffic_sensor = True
-        elif direction == 'EW' and not self.faulty_sensor:
-            self.EW_traffic_sensor = True
+        if direction == 'NS':
+            if not self.faulty_sensor_NS:
+                self.NS_traffic_sensor = True
+                self.cars_ns += 1
+            self.real_cars_ns += 1
+        elif direction == 'EW':
+            if not self.faulty_sensor_EW:
+                self.EW_traffic_sensor = True
+                self.cars_ew += 1
+            self.real_cars_ew += 1
         return self.change_traffic_lights()
 
     def waiting(self):
-        return self.update()
+        self.update()
+        return self.curr_dir + self.traffic_state()
 
     def change_traffic_lights(self):
         # IN case that both NS and EW are active, NS has advantage
@@ -265,46 +278,65 @@ class Crossroad:
                 pass
             elif not self.scheduled_change:
                 self.scheduled_change = 'NS'
-                self.time_to_change = 4
+                self.time_to_change = 2
         elif self.EW_pedestrian:
             self.EW_pedestrian = False
             if self.curr_dir == 'EW':
                 pass
             elif not self.scheduled_change:
                 self.scheduled_change = 'EW'
-                self.time_to_change = 4
+                self.time_to_change = 2
         elif self.NS_traffic_sensor:
-            self.NS_pedestrian = False
+            self.NS_traffic_sensor = False
             if self.curr_dir == 'NS':
                 pass
-            elif not self.scheduled_change:
+            elif not self.scheduled_change and not self.cars_ew > self.cars_ns:
                 self.scheduled_change = 'NS'
                 self.time_to_change = 3
         elif self.EW_traffic_sensor:
-            self.EW_pedestrian = False
+            self.EW_traffic_sensor = False
             if self.curr_dir == 'EW':
                 pass
-            elif not self.scheduled_change:
+            elif not self.scheduled_change and not self.cars_ns > self.cars_ew:
                 self.scheduled_change = 'EW'
                 self.time_to_change = 3
         self.update()
-        return self.curr_dir
+        return self.curr_dir + self.traffic_state()
+
+    def traffic_state(self):
+        # nr. of should never be > 5, so we signal a jam if nr. of cars > 6
+        state = "jam_ns" if self.real_cars_ns > 6 else str(self.real_cars_ns)
+        state += ":"
+        state += "jam_ew" if self.real_cars_ew > 6 else str(self.real_cars_ew)
+        return state
 
     def update(self):
+        if self.curr_dir == 'EW':
+            if not self.faulty_sensor_EW:
+                self.cars_ew = max(0, self.cars_ew - 1)
+            self.real_cars_ew = max(0, self.real_cars_ew - 1)
+        else:
+            if not self.faulty_sensor_NS:
+                self.cars_ns = max(0, self.cars_ns - 1)
+            self.real_cars_ns = max(0, self.real_cars_ns - 1)
         if self.scheduled_change:
             self.time_to_change -= 1
-            if self.time_to_change == 0:
+            if self.time_to_change <= 0:
                 self.curr_dir = self.scheduled_change
                 self.scheduled_change = None
                 self.time_to_change = 0
 
-    def inject_fault_in_sensor(self):
-        self.faulty_sensor = True
-        return self.curr_dir
+    def inject_fault_in_sensor_ns(self):
+        self.faulty_sensor_NS = True
+        return "None"
+
+    def inject_fault_in_sensor_ew(self):
+        self.faulty_sensor_EW = True
+        return "None"
 
     def inject_fault_in_button(self):
         self.faulty_button = True
-        return self.curr_dir
+        return "None"
 
 
 class StochasticLightSwitch:

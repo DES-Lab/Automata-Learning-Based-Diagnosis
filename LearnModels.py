@@ -92,14 +92,14 @@ def learn_vending_machine(visualize=False):
 
 def learn_crossroad(visualize=False):
     sul = CrossroadSUL()
-    alphabet = sul.alphabet
+    alphabet = sul.non_faulty_alphabet
 
-    eq_oracle = RandomWMethodEqOracle(alphabet, sul, walks_per_state=50, walk_len=20)
+    eq_oracle = RandomWMethodEqOracle(alphabet, sul, walks_per_state=5000, walk_len=20)
 
     learned_model = run_Lstar(alphabet, sul, eq_oracle, automaton_type='mealy')
 
     if visualize:
-        visualize_automaton(learned_model, display_same_state_trans=False)
+        visualize_automaton(learned_model, display_same_state_trans=False, file_type="dot")
 
     return learned_model
 
