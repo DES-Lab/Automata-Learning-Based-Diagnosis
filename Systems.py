@@ -243,6 +243,7 @@ class Crossroad:
         self.faulty_button = False
         self.faulty_sensor_NS = False
         self.faulty_sensor_EW = False
+        self.observable_cars = True
 
     def pedestrian_button(self, direction):
         assert direction in self.directions
@@ -257,7 +258,7 @@ class Crossroad:
         if direction == 'NS':
             if not self.faulty_sensor_NS:
                 self.NS_traffic_sensor = True
-                self.cars_ns += 1
+                self.cars_ns += 1 # sensor detecting arriving cars is faulty
             self.real_cars_ns += 1
         elif direction == 'EW':
             if not self.faulty_sensor_EW:
@@ -268,6 +269,14 @@ class Crossroad:
 
     def waiting(self):
         self.update()
+        if self.cars_ew == 0 and self.cars_ns > 0 and not self.scheduled_change:
+            # self.scheduled_change = 'NS'
+            # self.time_to_change = 2
+            self.curr_dir = 'NS'
+        elif self.cars_ns == 0 and self.cars_ew > 0 and not self.scheduled_change:
+            # self.scheduled_change = 'EW'
+            # self.time_to_change = 2
+            self.curr_dir = 'EW'
         return self.curr_dir + self.traffic_state()
 
     def change_traffic_lights(self):
@@ -305,19 +314,22 @@ class Crossroad:
 
     def traffic_state(self):
         # nr. of should never be > 5, so we signal a jam if nr. of cars > 6
-        state = "jam_ns" if self.real_cars_ns > 6 else str(self.real_cars_ns)
-        state += ":"
-        state += "jam_ew" if self.real_cars_ew > 6 else str(self.real_cars_ew)
+        if self.observable_cars:
+            state = "jam_ns" if self.real_cars_ns > 5 else str(self.real_cars_ns)
+            state += ":"
+            state += "jam_ew" if self.real_cars_ew > 5 else str(self.real_cars_ew)
+        else:
+            state = "jam_ns" if self.real_cars_ns > 5 else ""
+            state += ":" if self.real_cars_ns > 5 and self.real_cars_ew > 5 else ""
+            state += "jam_ew" if self.real_cars_ew > 5 else ""
         return state
 
     def update(self):
         if self.curr_dir == 'EW':
-            if not self.faulty_sensor_EW:
-                self.cars_ew = max(0, self.cars_ew - 1)
+            self.cars_ew = max(0, self.cars_ew - 1)
             self.real_cars_ew = max(0, self.real_cars_ew - 1)
         else:
-            if not self.faulty_sensor_NS:
-                self.cars_ns = max(0, self.cars_ns - 1)
+            self.cars_ns = max(0, self.cars_ns - 1)
             self.real_cars_ns = max(0, self.real_cars_ns - 1)
         if self.scheduled_change:
             self.time_to_change -= 1
@@ -327,11 +339,13 @@ class Crossroad:
                 self.time_to_change = 0
 
     def inject_fault_in_sensor_ns(self):
-        self.faulty_sensor_NS = True
+        if not self.faulty_sensor_EW and not self.faulty_sensor_NS:
+            self.faulty_sensor_NS = True
         return "None"
 
     def inject_fault_in_sensor_ew(self):
-        self.faulty_sensor_EW = True
+        if not self.faulty_sensor_EW and not self.faulty_sensor_NS:
+            self.faulty_sensor_EW = True
         return "None"
 
     def inject_fault_in_button(self):

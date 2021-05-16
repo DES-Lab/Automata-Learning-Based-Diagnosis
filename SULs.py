@@ -117,6 +117,8 @@ class CrossroadSUL(SUL):
         self.full_alphabet = ['pedestrian_NS', 'pedestrian_EW',
                          'traffic_NS', 'traffic_EW', 'waiting', 'fault_button',
                          'fault_sensor_ns','fault_sensor_ew']
+        self.full_non_faulty_alphabet = ['pedestrian_NS', 'pedestrian_EW',
+                         'traffic_NS', 'traffic_EW', 'waiting']
         self.alphabet = ['traffic_NS', 'traffic_EW', 'waiting',
                          'fault_sensor_ns','fault_sensor_ew']
         self.non_faulty_alphabet = ['traffic_NS', 'traffic_EW', 'waiting']
