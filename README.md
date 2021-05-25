@@ -9,7 +9,7 @@ On the one hand, we can learn models of faulty systems for being able to deploy 
 reasoning. Furthermore, we also show how to use fault models in the learning process, such as to derive a diagnostic model describing the diagnosis search 
 space.
 
-## Structure of the Repo
+## Structure of the Repository
 
 - `LearnedModels/` - visualized models of faulty systems and their encoding in the .dot format
 - `Systems.py` - Simple systems that serve as 'System under Learning'
