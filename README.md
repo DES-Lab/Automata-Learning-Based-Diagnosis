@@ -18,12 +18,12 @@ space.
 
 ## Systems Learned for Model-Based Reasoning
 
-- **Coffee Machine**
-- **GearBox**
-- **Crossroad System**
-- **Vending Machine**
-- **Stochastic Lightswitch**
-- **Differential Drive Robot**
+- *Coffee Machine*
+- *GearBox*
+- *Crossroad System*
+- *Vending Machine*
+- *Stochastic Lightswitch*
+- *Differential Drive Robot*
 
 ## Installation and Running
 To download:
