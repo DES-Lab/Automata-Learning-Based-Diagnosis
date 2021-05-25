@@ -2,7 +2,7 @@
 
 # Automata Learning Enabling Model-Based Diagnosis
 
-In this repository, we discuss how to use active automata learning in order to tackle the problem of creating the diagnostic model. We show how to learn 
+In this repository, we demonstrate how to use active automata learning in order to tackle the problem of creating the diagnostic model. We show how to learn 
 deterministic and stochastic models from reactive systems. 
 
 On the one hand, we can learn models of faulty systems for being able to deploy model-based 
