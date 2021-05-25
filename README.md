@@ -16,7 +16,7 @@ space.
 - `SULs.py` - A wrapper around each system, enabling active automata learning with AALpy
 - `ModelLearning.py` - Collections of methods invoking automata learning procedure for each system
 
-## Systems Learned for Model-Based Reasoning
+## Learned Systems
 
 - *Coffee Machine*
     - Insert a coin, and if 2 or 3 coins are inserted, get a coffee. The cost of coffee is two coins. Several bugs have been introduced. Fault model, the language of faults, stochastic fault model, and model suitable for diagnostic reasoning have been learned. 
