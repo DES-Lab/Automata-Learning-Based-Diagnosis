@@ -19,11 +19,18 @@ space.
 ## Systems Learned for Model-Based Reasoning
 
 - *Coffee Machine*
+    - Insert a coin, and if 2 or 3 coins are inserted, get a coffee. The cost of coffee is two coins. Several bugs have been introduced. Fault model, the language of faults, stochastic fault model, and model suitable for diagnostic reasoning have been learned. 
 - *GearBox*
+    - Simple gearbox system where user can press/release the clutch and change gears. 
+    Certain sequences of actions can break the gearbox. The fault model and language of faults have been learned.
 - *Crossroad System*
-- *Vending Machine*
+    - Crossroads, where two traffic lights control the traffic flow. Each lane can have up to 5 cars in the queue.
+- *Vending machine*
+    - Simple vending machine where a certain sequence of steps triggers a fault in vending machine logic.
 - *Stochastic Lightswitch*
+    - Modern light switch that displays faulty behavior in a stochastic manner.
 - *Differential Drive Robot*
+    - Simple robot with two wheels. Each wheel can be in one of 3 fault modes: spin faster, slower, or stuck. These faults can be injected and a model suitable for diagnostic reasoning constructed.
 
 ## Installation and Running
 To download:
@@ -31,4 +38,4 @@ To download:
 git clone https://github.com/DES-Lab/Automata-Learning-Based-Diagnosis
 pip install aalpy
 ```
-To run, simply run the `ModelLearning.py`. To learn any system, select the appropriate method and add it to `__main__`.
+To run, simply run the `ModelLearning.py`. Select the appropriate method and add it to `__main__` to learn any system.
