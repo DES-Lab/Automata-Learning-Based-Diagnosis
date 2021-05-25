@@ -1,0 +1,24 @@
+digraph "LearnedModels/stochasticLightSwitch" {
+s0 [label=s0];
+s1 [label=s1];
+s2 [label=s2];
+s3 [label=s3];
+s4 [label=s4];
+s5 [label=s5];
+s0 -> s1  [label="press/OFF:1.0"];
+s0 -> s0  [label="release/OFF:1.0"];
+s1 -> s5  [label="press/SHINING:0.2"];
+s1 -> s2  [label="press/OFF:0.8"];
+s1 -> s0  [label="release/OFF:1.0"];
+s2 -> s3  [label="press/OFF:1.0"];
+s2 -> s0  [label="release/OFF:1.0"];
+s3 -> s4  [label="press/OFF:1.0"];
+s3 -> s0  [label="release/OFF:1.0"];
+s4 -> s4  [label="press/OFF:0.9"];
+s4 -> s2  [label="press/SHINING:0.1"];
+s4 -> s0  [label="release/OFF:1.0"];
+s5 -> s5  [label="press/SHINING:1.0"];
+s5 -> s5  [label="release/SHINING:1.0"];
+__start0 [label="", shape=none];
+__start0 -> s0  [label=""];
+}

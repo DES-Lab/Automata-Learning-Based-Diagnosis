@@ -1,0 +1,19 @@
+digraph "LearnedModels/coffeeMachineStochastic" {
+s0 [label=s0];
+s1 [label=s1];
+s2 [label=s2];
+s3 [label=s3];
+s0 -> s1  [label="coin/CoinAdded:1.0"];
+s0 -> s0  [label="button/NoAction:0.98"];
+s0 -> s0  [label="button/Coffee:0.02"];
+s1 -> s2  [label="coin/CoinAdded:1.0"];
+s1 -> s1  [label="button/NoAction:0.98"];
+s1 -> s0  [label="button/Coffee:0.02"];
+s2 -> s3  [label="coin/CoinAdded:1.0"];
+s2 -> s0  [label="button/Coffee:1.0"];
+s3 -> s3  [label="coin/CoinsFull:0.8"];
+s3 -> s0  [label="coin/ReturnCoins:0.2"];
+s3 -> s1  [label="button/Coffee:1.0"];
+__start0 [label="", shape=none];
+__start0 -> s0  [label=""];
+}

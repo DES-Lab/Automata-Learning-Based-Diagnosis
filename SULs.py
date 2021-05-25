@@ -1,7 +1,11 @@
 from aalpy.base import SUL
 from Systems import DifferentialDriveRobot, WindTurbine, LightSwitch, GearBox, VendingMachine, \
-    Crossroad, StochasticLightSwitch
+    Crossroad, StochasticLightSwitch, DeterministicCoffeeMachine, StochasticCoffeeMachine, \
+    DeterministicFaultInjectedCoffeeMachine, DeterministicCoffeeMachineDFA
 
+
+# All systems are wrapped in the System Under Learning class
+# It defines a step operation on a system (a single action) and a reset (pre and post)
 
 class StrongFaultRobot(SUL):
     def __init__(self, upper_speed_limit=10):
@@ -80,15 +84,16 @@ class GearBoxSUL(SUL):
 
     def step(self, letter):
         if letter == 'press_clutch':
-            return self.gearbox.press_clutch()
+            out = self.gearbox.press_clutch()
         elif letter == 'release_clutch':
-            return self.gearbox.release_clutch()
+            out = self.gearbox.release_clutch()
         elif letter == 'put_in_reverse':
-            return self.gearbox.put_in_reverse()
+            out = self.gearbox.put_in_reverse()
         elif letter == 'increase_gear':
-            return self.gearbox.increase_gear()
+            out = self.gearbox.increase_gear()
         else:
-            return self.gearbox.decrease_gear()
+            out = self.gearbox.decrease_gear()
+        return out
 
 
 class VendingMachineSUL(SUL):
@@ -115,12 +120,12 @@ class CrossroadSUL(SUL):
         super().__init__()
         self.crossroad = Crossroad()
         self.full_alphabet = ['pedestrian_NS', 'pedestrian_EW',
-                         'traffic_NS', 'traffic_EW', 'waiting', 'fault_button',
-                         'fault_sensor_ns','fault_sensor_ew']
+                              'traffic_NS', 'traffic_EW', 'waiting', 'fault_button',
+                              'fault_sensor_ns', 'fault_sensor_ew']
         self.full_non_faulty_alphabet = ['pedestrian_NS', 'pedestrian_EW',
-                         'traffic_NS', 'traffic_EW', 'waiting']
+                                         'traffic_NS', 'traffic_EW', 'waiting']
         self.alphabet = ['traffic_NS', 'traffic_EW', 'waiting',
-                         'fault_sensor_ns','fault_sensor_ew']
+                         'fault_sensor_ns', 'fault_sensor_ew']
         self.non_faulty_alphabet = ['traffic_NS', 'traffic_EW', 'waiting']
 
     def pre(self):
@@ -157,3 +162,79 @@ class StochasticLightSUL(SUL):
 
     def step(self, letter):
         return self.light_switch.press() if letter == 'press' else self.light_switch.release()
+
+
+class FaultyCoffeeMachineSUL(SUL):
+    def __init__(self):
+        super().__init__()
+        self.coffee_machine = DeterministicCoffeeMachine(True)
+
+    def pre(self):
+        self.coffee_machine.counter = 0
+
+    def post(self):
+        pass
+
+    def step(self, letter):
+        if letter == 'coin':
+            return self.coffee_machine.add_coin()
+        else:
+            return self.coffee_machine.button()
+
+
+class FaultyCoffeeMachineSULDFA(SUL):
+    def __init__(self):
+        super().__init__()
+        self.coffee_machine = DeterministicCoffeeMachineDFA()
+
+    def pre(self):
+        self.coffee_machine.counter = 0
+        self.coffee_machine.correct_counter = 0
+
+    def post(self):
+        pass
+
+    def step(self, letter):
+        if letter == 'coin':
+            return self.coffee_machine.add_coin()
+        else:
+            return self.coffee_machine.button()
+
+
+class StochasticCoffeeMachineSUL(SUL):
+    def __init__(self):
+        super().__init__()
+        self.coffee_machine = StochasticCoffeeMachine()
+
+    def pre(self):
+        self.coffee_machine.counter = 0
+
+    def post(self):
+        pass
+
+    def step(self, letter):
+        if letter == 'coin':
+            return self.coffee_machine.add_coin()
+        else:
+            return self.coffee_machine.button()
+
+
+class FaultInjectedCoffeeMachineSUL(SUL):
+    def __init__(self):
+        super().__init__()
+        self.coffee_machine = DeterministicFaultInjectedCoffeeMachine()
+
+    def pre(self):
+        self.coffee_machine.counter = 0
+        self.coffee_machine.fault = None
+
+    def post(self):
+        pass
+
+    def step(self, letter):
+        if letter == 'coin':
+            return self.coffee_machine.add_coin()
+        elif letter == 'button':
+            return self.coffee_machine.button()
+        else:
+            return self.coffee_machine.inject_fault(letter)

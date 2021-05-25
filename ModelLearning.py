@@ -1,11 +1,14 @@
 from aalpy.SULs import MealySUL
 from aalpy.learning_algs import run_Lstar, run_stochastic_Lstar
 from aalpy.oracles import RandomWMethodEqOracle, UnseenOutputRandomWordEqOracle
-from aalpy.utils import visualize_automaton, save_automaton_to_file
+from aalpy.utils import visualize_automaton
 
 from SULs import StrongFaultRobot, TurbineSUL, LightSwitchSUL, GearBoxSUL, VendingMachineSUL, CrossroadSUL, \
-    StochasticLightSUL
+    StochasticLightSUL, FaultyCoffeeMachineSUL, StochasticCoffeeMachineSUL, FaultInjectedCoffeeMachineSUL, \
+    FaultyCoffeeMachineSULDFA
 
+
+# Each method can be used to actively learn the model of the black-box system
 
 def learn_diff_drive_robot(visualize=False):
     all_faults = ['left_faster', 'left_slower', 'left_stuck', 'right_faster', 'right_slower', 'right_stuck']
@@ -62,9 +65,9 @@ def learn_gearbox(visualize=False):
 
     sul = GearBoxSUL()
 
-    eq_oracle = RandomWMethodEqOracle(alphabet, sul, walks_per_state=20, walk_len=15)
+    eq_oracle = RandomWMethodEqOracle(alphabet, sul, walks_per_state=2000, walk_len=15)
 
-    learned_model = run_Lstar(alphabet, sul, eq_oracle, automaton_type='moore')
+    learned_model = run_Lstar(alphabet, sul, eq_oracle, automaton_type='mealy')
 
     if visualize:
         visualize_automaton(learned_model, display_same_state_trans=False)
@@ -96,7 +99,8 @@ def learn_crossroad(visualize=False):
 
     eq_oracle = RandomWMethodEqOracle(alphabet, sul, walks_per_state=5000, walk_len=20)
 
-    learned_model = run_Lstar(alphabet, sul, eq_oracle, automaton_type='mealy', cache_and_non_det_check=False)
+    learned_model = run_Lstar(alphabet, sul, eq_oracle, automaton_type='mealy', cache_and_non_det_check=False,
+                              max_learning_rounds=1)
 
     if visualize:
         visualize_automaton(learned_model, display_same_state_trans=False, file_type="dot")
@@ -118,6 +122,63 @@ def learn_stochastic_light_switch(visualize=False):
     return learned_model
 
 
+def learn_coffee_machine(visualize=False):
+    sul = FaultyCoffeeMachineSUL()
+    alphabet = ['coin', 'button']
+
+    eq_oracle = RandomWMethodEqOracle(alphabet, sul, walks_per_state=5000, walk_len=20)
+
+    learned_model = run_Lstar(alphabet, sul, eq_oracle, automaton_type='mealy', cache_and_non_det_check=True)
+
+    if visualize:
+        visualize_automaton(learned_model, display_same_state_trans=True)
+
+    return learned_model
+
+
+def learn_language_of_coffee_machine_error(visualize=False):
+    sul = FaultyCoffeeMachineSULDFA()
+    alphabet = ['coin', 'button']
+
+    eq_oracle = RandomWMethodEqOracle(alphabet, sul, walks_per_state=5000, walk_len=20)
+
+    learned_model = run_Lstar(alphabet, sul, eq_oracle, automaton_type='dfa', cache_and_non_det_check=True)
+
+    if visualize:
+        visualize_automaton(learned_model, display_same_state_trans=True)
+
+    return learned_model
+
+
+def learn_stochastic_coffee_machine(visualize=False):
+    sul = StochasticCoffeeMachineSUL()
+    alphabet = ['coin', 'button']
+
+    eq_oracle = UnseenOutputRandomWordEqOracle(alphabet, sul, num_walks=100, min_walk_len=5, max_walk_len=10)
+
+    learned_model = run_stochastic_Lstar(alphabet, sul, eq_oracle, automaton_type='smm')
+
+    if visualize:
+        visualize_automaton(learned_model, display_same_state_trans=True)
+
+    return learned_model
+
+
+def learn_coffee_machine_mbd(visualize=False):
+    sul = FaultInjectedCoffeeMachineSUL()
+    alphabet = ['coin', 'button', 'coin_double_value', 'button_no_effect']
+
+    eq_oracle = RandomWMethodEqOracle(alphabet, sul, walks_per_state=5000, walk_len=20)
+
+    learned_model = run_Lstar(alphabet, sul, eq_oracle, automaton_type='mealy', cache_and_non_det_check=False)
+
+    if visualize:
+        visualize_automaton(learned_model, display_same_state_trans=True)
+
+    return learned_model
+
+
 if __name__ == '__main__':
-    model = learn_crossroad(True)
+    model = learn_stochastic_coffee_machine(False)
     print(model)
+    visualize_automaton(model, display_same_state_trans=True)

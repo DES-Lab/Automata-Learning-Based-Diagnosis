@@ -1,0 +1,16 @@
+digraph "LearnedModels/coffeeMachineFaultModel" {
+s0 [label=s0];
+s1 [label=s1];
+s2 [label=s2];
+s3 [label=s3];
+s0 -> s1  [label="coin/CoinAdded"];
+s0 -> s0  [label="button/NoAction"];
+s1 -> s2  [label="coin/CoinAdded"];
+s1 -> s1  [label="button/NoAction"];
+s2 -> s3  [label="coin/CoinAdded"];
+s2 -> s1  [label="button/Coffee"];
+s3 -> s3  [label="coin/CoinsFull"];
+s3 -> s2  [label="button/Coffee"];
+__start0 [label="", shape=none];
+__start0 -> s0  [label=""];
+}

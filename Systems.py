@@ -225,9 +225,8 @@ class VendingMachine:
         return 'INSUFFICIENT_COINS'
 
 
-
 class Crossroad:
-    def __init__(self):
+    def __init__(self, max_car_limit=5):
         self.directions = {'NS', 'EW'}
         self.curr_dir = 'NS'
         self.cars_ns = 0  # cars seen by traffic light
@@ -244,6 +243,7 @@ class Crossroad:
         self.faulty_sensor_NS = False
         self.faulty_sensor_EW = False
         self.observable_cars = True
+        self.max_car_limit = max_car_limit
 
     def pedestrian_button(self, direction):
         assert direction in self.directions
@@ -258,7 +258,7 @@ class Crossroad:
         if direction == 'NS':
             if not self.faulty_sensor_NS:
                 self.NS_traffic_sensor = True
-                self.cars_ns += 1 # sensor detecting arriving cars is faulty
+                self.cars_ns += 1  # sensor detecting arriving cars is faulty
             self.real_cars_ns += 1
         elif direction == 'EW':
             if not self.faulty_sensor_EW:
@@ -383,3 +383,104 @@ class StochasticLightSwitch:
                 return 'OFF'
             return 'SHINING'
         return 'OFF'
+
+
+class DeterministicCoffeeMachine:
+    def __init__(self, inject_fault=True):
+        self.counter = 0
+        self.inject_fault = inject_fault
+
+    def add_coin(self):
+        if self.counter == 3:
+            return 'CoinsFull'
+        self.counter = min(self.counter + 1, 3)
+        return 'CoinAdded'
+
+    def button(self):
+        if self.counter >= 2:
+            if self.inject_fault:
+                self.counter -= 1
+            else:
+                self.counter -= 2
+            return 'Coffee'
+        else:
+            return 'NoAction'
+
+
+class DeterministicCoffeeMachineDFA:
+    def __init__(self):
+        self.counter = 0
+        self.correct_counter = 0
+
+    def add_coin(self):
+        if self.correct_counter == 3:
+            return False
+        self.counter = min(self.counter + 1, 3)
+        self.correct_counter = min(self.correct_counter + 1, 3)
+        return False
+
+    def button(self):
+        if self.correct_counter == 3:
+            self.counter -= 1
+            self.correct_counter -= 2
+        if self.correct_counter < 2 and self.counter >= 2:
+            return True
+        return False
+
+
+class StochasticCoffeeMachine:
+    def __init__(self):
+        self.counter = 0
+
+    def add_coin(self):
+        if self.counter == 3:
+            if random.random() >= 0.2:
+                return 'CoinsFull'
+            else:
+                self.counter = 0
+                return 'ReturnCoins'
+        self.counter = min(self.counter + 1, 3)
+        return 'CoinAdded'
+
+    def button(self):
+        if self.counter >= 2:
+            self.counter -= 2
+            return 'Coffee'
+        else:
+            if random.random() <= 0.02:
+                self.counter = 0
+                return 'Coffee'
+            return 'NoAction'
+
+
+class DeterministicFaultInjectedCoffeeMachine:
+    def __init__(self):
+        self.counter = 0
+        self.fault = None
+        self.possible_faults = ['coin_double_value', 'button_no_effect']
+
+    def inject_fault(self, fault):
+        assert fault in self.possible_faults
+        if self.fault:
+            return 'False'
+        else:
+            self.fault = fault
+            return 'True'
+
+    def add_coin(self):
+        if self.counter == 3:
+            return 'CoinsFull'
+        if self.fault == 'coin_double_value':
+            self.counter = min(self.counter + 2, 3)
+        else:
+            self.counter = min(self.counter + 1, 3)
+        return 'CoinAdded'
+
+    def button(self):
+        if self.fault == 'button_no_effect':
+            return 'NoAction'
+        if self.counter >= 2:
+            self.counter -= 2
+            return 'Coffee'
+        else:
+            return 'NoAction'
