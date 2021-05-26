@@ -179,6 +179,6 @@ def learn_coffee_machine_mbd(visualize=False):
 
 
 if __name__ == '__main__':
-    model = learn_stochastic_coffee_machine(False)
+    model = learn_language_of_coffee_machine_error(False)
     print(model)
     visualize_automaton(model, display_same_state_trans=True)

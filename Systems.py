@@ -399,7 +399,7 @@ class DeterministicCoffeeMachine:
     def button(self):
         if self.counter >= 2:
             if self.inject_fault:
-                self.counter -= 1
+                self.counter -= 1 if self.counter == 3 else 2
             else:
                 self.counter -= 2
             return 'Coffee'
@@ -410,21 +410,20 @@ class DeterministicCoffeeMachine:
 class DeterministicCoffeeMachineDFA:
     def __init__(self):
         self.counter = 0
-        self.correct_counter = 0
+        self.max_coins_reached = False
 
     def add_coin(self):
-        if self.correct_counter == 3:
+        if self.counter == 3:
             return False
         self.counter = min(self.counter + 1, 3)
-        self.correct_counter = min(self.correct_counter + 1, 3)
         return False
 
     def button(self):
-        if self.correct_counter == 3:
+        if self.counter == 3:
             self.counter -= 1
-            self.correct_counter -= 2
-        if self.correct_counter < 2 and self.counter >= 2:
             return True
+        if self.counter == 2:
+            self.counter -= 2
         return False
 
 
