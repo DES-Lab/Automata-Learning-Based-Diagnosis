@@ -1,7 +1,7 @@
 from aalpy.SULs import MealySUL
 from aalpy.learning_algs import run_Lstar, run_stochastic_Lstar
 from aalpy.oracles import RandomWMethodEqOracle, UnseenOutputRandomWordEqOracle
-from aalpy.utils import visualize_automaton
+from aalpy.utils import visualize_automaton, save_automaton_to_file
 
 from SULs import StrongFaultRobot, TurbineSUL, LightSwitchSUL, GearBoxSUL, VendingMachineSUL, CrossroadSUL, \
     StochasticLightSUL, FaultyCoffeeMachineSUL, StochasticCoffeeMachineSUL, FaultInjectedCoffeeMachineSUL, \
@@ -95,12 +95,12 @@ def learn_vending_machine(visualize=False):
 
 def learn_crossroad(visualize=False):
     sul = CrossroadSUL()
-    alphabet = sul.alphabet
+    alphabet = sul.full_alphabet
 
-    eq_oracle = RandomWMethodEqOracle(alphabet, sul, walks_per_state=5000, walk_len=20)
+    eq_oracle = RandomWMethodEqOracle(alphabet, sul, walks_per_state=10, walk_len=30)
 
     learned_model = run_Lstar(alphabet, sul, eq_oracle, automaton_type='mealy', cache_and_non_det_check=False,
-                              max_learning_rounds=1)
+                              max_learning_rounds=10)
 
     if visualize:
         visualize_automaton(learned_model, display_same_state_trans=False, file_type="dot")
@@ -179,6 +179,6 @@ def learn_coffee_machine_mbd(visualize=False):
 
 
 if __name__ == '__main__':
-    model = learn_language_of_coffee_machine_error(False)
-    print(model)
-    visualize_automaton(model, display_same_state_trans=True)
+    model = learn_crossroad(False)
+    save_automaton_to_file(model, path='CrossroadModelFull')
+    #visualize_automaton(model, display_same_state_trans=True)
