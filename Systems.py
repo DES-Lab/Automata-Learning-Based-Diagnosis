@@ -397,14 +397,14 @@ class DeterministicCoffeeMachine:
         return 'CoinAdded'
 
     def button(self):
-        if self.counter >= 2:
+        output = 'Coffee' if self.counter >= 2 else 'NoAction'
+        if self.counter == 3:
             if self.inject_fault:
                 self.counter -= 1 if self.counter == 3 else 2
-            else:
+            elif self.counter == 2:
                 self.counter -= 2
-            return 'Coffee'
-        else:
-            return 'NoAction'
+
+        return output
 
 
 class DeterministicCoffeeMachineDFA:
@@ -413,6 +413,8 @@ class DeterministicCoffeeMachineDFA:
         self.correct_counter = 0
 
     def add_coin(self):
+        if self.counter == 3:
+            return False
         self.counter = min(self.counter + 1, 3)
         self.correct_counter = min(self.correct_counter + 1, 3)
         return False

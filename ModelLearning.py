@@ -179,6 +179,6 @@ def learn_coffee_machine_mbd(visualize=False):
 
 
 if __name__ == '__main__':
-    model = learn_language_of_coffee_machine_error(True)
+    model = learn_coffee_machine(True)
     #save_automaton_to_file(model, path='CrossroadModelFull')
     #visualize_automaton(model, display_same_state_trans=True)
