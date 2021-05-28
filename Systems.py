@@ -410,21 +410,22 @@ class DeterministicCoffeeMachine:
 class DeterministicCoffeeMachineDFA:
     def __init__(self):
         self.counter = 0
-        self.max_coins_reached = False
+        self.correct_counter = 0
 
     def add_coin(self):
-        if self.counter == 3:
-            return False
         self.counter = min(self.counter + 1, 3)
+        self.correct_counter = min(self.correct_counter + 1, 3)
         return False
 
     def button(self):
+        property_violation = self.counter >= 2 and self.correct_counter < 2
         if self.counter == 3:
             self.counter -= 1
-            return True
-        if self.counter == 2:
+            self.correct_counter = max(self.correct_counter - 2, 0)
+        elif self.correct_counter == 2:
             self.counter -= 2
-        return False
+            self.correct_counter = max(self.correct_counter - 2, 0)
+        return property_violation
 
 
 class StochasticCoffeeMachine:

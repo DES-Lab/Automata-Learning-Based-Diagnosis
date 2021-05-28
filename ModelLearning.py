@@ -140,7 +140,7 @@ def learn_language_of_coffee_machine_error(visualize=False):
     sul = FaultyCoffeeMachineSULDFA()
     alphabet = ['coin', 'button']
 
-    eq_oracle = RandomWMethodEqOracle(alphabet, sul, walks_per_state=5000, walk_len=20)
+    eq_oracle = RandomWMethodEqOracle(alphabet, sul, walks_per_state=5000, walk_len=8)
 
     learned_model = run_Lstar(alphabet, sul, eq_oracle, automaton_type='dfa', cache_and_non_det_check=True)
 
@@ -179,6 +179,6 @@ def learn_coffee_machine_mbd(visualize=False):
 
 
 if __name__ == '__main__':
-    model = learn_crossroad(False)
-    save_automaton_to_file(model, path='CrossroadModelFull')
+    model = learn_language_of_coffee_machine_error(True)
+    #save_automaton_to_file(model, path='CrossroadModelFull')
     #visualize_automaton(model, display_same_state_trans=True)

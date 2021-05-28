@@ -189,7 +189,7 @@ class FaultyCoffeeMachineSULDFA(SUL):
 
     def pre(self):
         self.coffee_machine.counter = 0
-        self.coffee_machine.max_coins_reached = False
+        self.coffee_machine.correct_counter = 0
 
     def post(self):
         pass
