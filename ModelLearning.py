@@ -1,6 +1,6 @@
 from aalpy.SULs import MealySUL
 from aalpy.learning_algs import run_Lstar, run_stochastic_Lstar
-from aalpy.oracles import RandomWMethodEqOracle, UnseenOutputRandomWordEqOracle
+from aalpy.oracles import RandomWMethodEqOracle, RandomWordEqOracle
 from aalpy.utils import visualize_automaton, save_automaton_to_file
 
 from SULs import StrongFaultRobot, TurbineSUL, LightSwitchSUL, GearBoxSUL, VendingMachineSUL, CrossroadSUL, \
@@ -154,7 +154,7 @@ def learn_stochastic_coffee_machine(visualize=False):
     sul = StochasticCoffeeMachineSUL()
     alphabet = ['coin', 'button']
 
-    eq_oracle = UnseenOutputRandomWordEqOracle(alphabet, sul, num_walks=100, min_walk_len=5, max_walk_len=10)
+    eq_oracle = RandomWordEqOracle(alphabet, sul, num_walks=100, min_walk_len=5, max_walk_len=10)
 
     learned_model = run_stochastic_Lstar(alphabet, sul, eq_oracle, automaton_type='smm')
 
