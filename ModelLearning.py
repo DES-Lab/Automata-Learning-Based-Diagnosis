@@ -156,7 +156,7 @@ def learn_stochastic_coffee_machine(visualize=False):
 
     eq_oracle = RandomWordEqOracle(alphabet, sul, num_walks=100, min_walk_len=5, max_walk_len=10)
 
-    learned_model = run_stochastic_Lstar(alphabet, sul, eq_oracle, automaton_type='smm')
+    learned_model = run_stochastic_Lstar(alphabet, sul, eq_oracle, automaton_type='smm', cex_processing=None)
 
     if visualize:
         visualize_automaton(learned_model, display_same_state_trans=True)
