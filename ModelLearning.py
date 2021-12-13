@@ -112,7 +112,7 @@ def learn_stochastic_light_switch(visualize=False):
     sul = StochasticLightSUL()
     alphabet = ['press', 'release']
 
-    eq_oracle = UnseenOutputRandomWordEqOracle(alphabet, sul, num_walks=100, min_walk_len=3, max_walk_len=7)
+    eq_oracle = RandomWordEqOracle(alphabet, sul, num_walks=100, min_walk_len=3, max_walk_len=7)
 
     learned_model = run_stochastic_Lstar(alphabet, sul, eq_oracle, automaton_type='smm')
 
@@ -179,6 +179,6 @@ def learn_coffee_machine_mbd(visualize=False):
 
 
 if __name__ == '__main__':
-    model = learn_coffee_machine(True)
+    model = learn_vending_machine(True)
     #save_automaton_to_file(model, path='CrossroadModelFull')
     #visualize_automaton(model, display_same_state_trans=True)
